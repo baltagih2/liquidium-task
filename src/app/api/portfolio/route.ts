@@ -5,21 +5,24 @@ const prisma = new PrismaClient();
 
 export async function GET() {
   try {
-    const ordinals = await prisma.userOrdinal.findMany({
-      include: { collection: true },
-    });
+    const ordinals: { floorPrice: number }[] =
+      await prisma.userOrdinal.findMany({
+        select: { floorPrice: true },
+      });
 
     const totalPortfolioValue = ordinals.reduce(
-      (sum: number, ordinal) => sum + ordinal.floorPrice,
+      (sum: number, ordinal: { floorPrice: number }) =>
+        sum + ordinal.floorPrice,
       0
     );
 
     const availableLiquidity = ordinals
-      .filter(
-        (ordinal) =>
-          ordinal.collection !== null && ordinal.floorPrice >= 0.00065
-      )
-      .reduce((sum: number, ordinal) => sum + ordinal.floorPrice, 0);
+      .filter((ordinal) => ordinal.floorPrice >= 0.00065)
+      .reduce(
+        (sum: number, ordinal: { floorPrice: number }) =>
+          sum + ordinal.floorPrice,
+        0
+      );
 
     return NextResponse.json({
       totalPortfolioValue,
