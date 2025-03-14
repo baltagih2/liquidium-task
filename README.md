@@ -32,3 +32,14 @@ npm run dev
 ```
 
 and go to `localhost:3000`
+
+Or the production url [`https://liquidium-task.vercel.app/`](https://liquidium-task.vercel.app/)
+
+## Testing
+
+```
+npm test
+```
+
+You can add more tests in:
+`tests/`
