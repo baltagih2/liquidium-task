@@ -62,7 +62,6 @@ export default function CreateOfferModal({ ordinal }: ModalProps) {
       </DialogTrigger>
       <DialogContent className="min-w-[600px]">
         <DialogTitle>Create a custom request</DialogTitle>
-        {/* Ordinal Info */}
         <div className="mt-4 flex items-center">
           <Image
             src={ordinal.renderUrl || ordinal.contentUrl}
@@ -78,9 +77,7 @@ export default function CreateOfferModal({ ordinal }: ModalProps) {
           </div>
         </div>
 
-        {/* Loan Terms */}
         <div className="mt-6 space-y-4">
-          {/* Loan Duration */}
           <div>
             <label className="text-sm text-[#9ca3af]">Term</label>
             <Input
@@ -91,7 +88,6 @@ export default function CreateOfferModal({ ordinal }: ModalProps) {
             />
           </div>
 
-          {/* Loan Amount */}
           <div>
             <label className="text-sm text-[#9ca3af]">Amount (BTC)</label>
             <Input
@@ -102,7 +98,6 @@ export default function CreateOfferModal({ ordinal }: ModalProps) {
             />
           </div>
 
-          {/* Interest Rate */}
           <div>
             <label className="text-sm text-[#9ca3af]">Interest (%)</label>
             <Input
@@ -114,7 +109,6 @@ export default function CreateOfferModal({ ordinal }: ModalProps) {
           </div>
         </div>
 
-        {/* Action Buttons */}
         <div className="flex justify-between mt-6">
           <DialogClose>Close</DialogClose>
           <Button

@@ -79,7 +79,6 @@ export default function EditOfferModal({ offer, onOfferUpdated }: ModalProps) {
           </div>
         </div>
 
-        {/* Loan Terms */}
         <div className="mt-6 space-y-4">
           <div>
             <label className="text-sm text-[#9ca3af]">Term (Days)</label>
@@ -110,7 +109,6 @@ export default function EditOfferModal({ offer, onOfferUpdated }: ModalProps) {
           </div>
         </div>
 
-        {/* Action Buttons */}
         <div className="flex justify-between mt-6">
           <DialogClose>Close</DialogClose>
           <Button

@@ -10,7 +10,7 @@ export async function GET() {
     });
 
     const totalPortfolioValue = ordinals.reduce(
-      (sum, ordinal) => sum + ordinal.floorPrice,
+      (sum: number, ordinal) => sum + ordinal.floorPrice,
       0
     );
 
@@ -19,7 +19,7 @@ export async function GET() {
         (ordinal) =>
           ordinal.collection !== null && ordinal.floorPrice >= 0.00065
       )
-      .reduce((sum, ordinal) => sum + ordinal.floorPrice, 0);
+      .reduce((sum: number, ordinal) => sum + ordinal.floorPrice, 0);
 
     return NextResponse.json({
       totalPortfolioValue,
