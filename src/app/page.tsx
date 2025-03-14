@@ -1,103 +1,118 @@
-import Image from "next/image";
+"use client";
 
-export default function Home() {
+import { useCallback, useEffect, useMemo, useState } from "react";
+import { Search } from "lucide-react";
+import { Offer, Ordinal } from "../../interfaces";
+import OrdinalsSection from "@/components/OrdinalsSection";
+import OffersSection from "@/components/OffersSection";
+import { Input } from "@/components/ui/input";
+import { bitcoinPrice } from "../../constants";
+
+export default function Portfolio() {
+  const [ordinals, setOrdinals] = useState<Ordinal[]>([]);
+  const [offers, setOffers] = useState<Offer[]>([]);
+  const [searchQuery, setSearchQuery] = useState("");
+  const [loading, setLoading] = useState(true);
+  const [portfolioStats, setPortfolioStats] = useState({
+    totalPortfolioValue: 0,
+    availableLiquidity: 0,
+  });
+
+  useEffect(() => {
+    Promise.all([
+      fetch("/api/ordinals")
+        .then((res) => res.json())
+        .then(setOrdinals),
+      fetch("/api/offers")
+        .then((res) => res.json())
+        .then(setOffers),
+      fetch("/api/portfolio")
+        .then((res) => res.json())
+        .then(setPortfolioStats),
+    ]).finally(() => setLoading(false));
+  }, []);
+
+  const filteredOrdinals = useMemo(
+    () =>
+      ordinals.filter((ordinal) =>
+        ordinal.inscriptionName
+          .toLowerCase()
+          .includes(searchQuery.toLowerCase())
+      ),
+    [ordinals, searchQuery]
+  );
+
+  const handleSearch = useCallback((query: string) => {
+    setSearchQuery(query);
+  }, []);
+
+  const handleOfferUpdated = useCallback((updatedOffer: Offer) => {
+    setOffers((prev) =>
+      prev.map((offer) => (offer.id === updatedOffer.id ? updatedOffer : offer))
+    );
+  }, []);
+
+  const handleOfferDeleted = useCallback((deletedOfferId: string) => {
+    setOffers((prev) => prev.filter((offer) => offer.id !== deletedOfferId));
+  }, []);
+
   return (
-    <div className="grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20 font-[family-name:var(--font-geist-sans)]">
-      <main className="flex flex-col gap-[32px] row-start-2 items-center sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={180}
-          height={38}
-          priority
-        />
-        <ol className="list-inside list-decimal text-sm/6 text-center sm:text-left font-[family-name:var(--font-geist-mono)]">
-          <li className="mb-2 tracking-[-.01em]">
-            Get started by editing{" "}
-            <code className="bg-black/[.05] dark:bg-white/[.06] px-1 py-0.5 rounded font-[family-name:var(--font-geist-mono)] font-semibold">
-              src/app/page.tsx
-            </code>
-            .
-          </li>
-          <li className="tracking-[-.01em]">
-            Save and see your changes instantly.
-          </li>
-        </ol>
-
-        <div className="flex gap-4 items-center flex-col sm:flex-row">
-          <a
-            className="rounded-full border border-solid border-transparent transition-colors flex items-center justify-center bg-foreground text-background gap-2 hover:bg-[#383838] dark:hover:bg-[#ccc] font-medium text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 sm:w-auto"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={20}
-              height={20}
-            />
-            Deploy now
-          </a>
-          <a
-            className="rounded-full border border-solid border-black/[.08] dark:border-white/[.145] transition-colors flex items-center justify-center hover:bg-[#f2f2f2] dark:hover:bg-[#1a1a1a] hover:border-transparent font-medium text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 w-full sm:w-auto md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Read our docs
-          </a>
+    <main className="p-6 bg-secondary min-h-screen text-foreground">
+      {/* Portfolio Summary */}
+      <div className="flex justify-between items-center mb-6 gap-4">
+        <div className="bg-gray-900 p-4 rounded-lg w-1/2">
+          <h3 className="text-sm text-[#9ca3af]">Total Portfolio Value</h3>
+          <p className="text-xl font-bold space-x-10">
+            <span>₿{portfolioStats.totalPortfolioValue.toFixed(10)}&nbsp;</span>
+            <span className="text-[#9ca3af]">
+              ${(portfolioStats.totalPortfolioValue * bitcoinPrice)?.toFixed(2)}
+            </span>
+          </p>
         </div>
-      </main>
-      <footer className="row-start-3 flex gap-[24px] flex-wrap items-center justify-center">
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/file.svg"
-            alt="File icon"
-            width={16}
-            height={16}
+        <div className="bg-gray-900 p-4 rounded-lg w-1/2">
+          <h3 className="text-sm text-[#9ca3af]">Available Liquidity</h3>
+          <p className="text-xl font-bold space-x-10">
+            <span>₿{portfolioStats.availableLiquidity.toFixed(10)}&nbsp;</span>
+            <span className="text-[#9ca3af]">
+              ${(portfolioStats.availableLiquidity * bitcoinPrice)?.toFixed(2)}
+            </span>
+          </p>
+        </div>
+      </div>
+
+      {/* Search Bar */}
+      <div className="flex items-center bg-gray-800 p-3 rounded-lg mb-6">
+        <Search className="text-[#9ca3af] mr-3" />
+        <Input
+          type="text"
+          placeholder="Search..."
+          className="bg-transparent text-textPrimary outline-none w-full"
+          value={searchQuery}
+          onChange={(e) => handleSearch(e.target.value)}
+        />
+      </div>
+
+      {/* Ordinals Grid */}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+        {loading ? (
+          <p className="text-[#9ca3af]">Loading...</p>
+        ) : (
+          <OrdinalsSection ordinals={filteredOrdinals} />
+        )}
+      </div>
+
+      <h2 className="text-xl font-bold mt-10 mb-4">Your Offers</h2>
+      <div className="bg-gray-800 p-4 rounded-lg shadow-md">
+        {loading ? (
+          <p>Loading Offers...</p>
+        ) : (
+          <OffersSection
+            offers={offers}
+            handleOfferUpdated={handleOfferUpdated}
+            handleOfferDeleted={handleOfferDeleted}
           />
-          Learn
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/window.svg"
-            alt="Window icon"
-            width={16}
-            height={16}
-          />
-          Examples
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/globe.svg"
-            alt="Globe icon"
-            width={16}
-            height={16}
-          />
-          Go to nextjs.org →
-        </a>
-      </footer>
-    </div>
+        )}
+      </div>
+    </main>
   );
 }

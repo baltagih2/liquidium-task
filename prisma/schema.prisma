@@ -1,0 +1,47 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model UserOrdinal {
+  id              String   @id @default(uuid())
+  inscriptionId   String   @unique
+  inscriptionName String
+  collectionId    String?
+  ownerWallet     String
+  mimeType        String
+  floorPrice      Float
+  lastSalePrice   Float
+  metadata        Json
+  contentUrl      String
+  bisUrl          String
+  renderUrl       String?
+  createdAt       DateTime @default(now())
+
+  collection Collection? @relation(fields: [collectionId], references: [id])
+  offers     Offer[]     @relation("OrdinalOffers")
+}
+
+model Collection {
+  id       String        @id @default(uuid())
+  slug     String        @unique
+  name     String
+  ordinals UserOrdinal[]
+}
+
+model Offer {
+  id        String   @id @default(uuid())
+  ordinalId String
+  amount    Float
+  ltv       Float
+  termDays  Int
+  interest  Float
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  ordinal UserOrdinal @relation("OrdinalOffers", fields: [ordinalId], references: [id])
+}
